@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meshcore Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link
+        href="https://unpkg.com/tabulator-tables@6.3.0/dist/css/tabulator_midnight.min.css"
+        rel="stylesheet"
+    >
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <style>
+        :root
+        {
+            color-scheme: dark;
+            --bg: #111827;
+            --panel: #1f2937;
+            --panel-2: #0f172a;
+            --border: #374151;
+            --text: #e5e7eb;
+            --muted: #9ca3af;
+            --accent: #60a5fa;
+        }
+
+        *
+        {
+            box-sizing: border-box;
+        }
+
+        html,
+        body
+        {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        body
+        {
+            min-width: 1280px;
+        }
+
+        .app
+        {
+            display: grid;
+            grid-template-columns: 460px 1fr;
+            gap: 16px;
+            height: calc(100vh - 95px);
+            padding: 16px;
+        }
+        .panel
+        {
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .panel-header
+        {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            background: var(--panel-2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .panel-title
+        {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .panel-subtitle
+        {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .status
+        {
+            color: var(--muted);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .toolbar
+        {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .toolbar label
+        {
+            color: var(--muted);
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .toolbar select
+        {
+            width: 220px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #0b1220;
+            color: var(--text);
+            outline: none;
+        }
+
+        .panel-content
+        {
+            min-height: 0;
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #nodesTable
+        {
+            flex: 1;
+            min-height: 0;
+            height: 100%;
+        }
+
+        .empty-state
+        {
+            display: grid;
+            place-items: center;
+            height: 100%;
+            color: var(--muted);
+            font-size: 18px;
+            text-align: center;
+            padding: 32px;
+        }
+
+        .tabulator
+        {
+            height: 100%;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+        }
+
+        .tabulator .tabulator-header
+        {
+            border-bottom: 1px solid var(--border);
+            background: #1b2433;
+        }
+
+        .tabulator .tabulator-header .tabulator-col
+        {
+            background: #1b2433;
+            border-right: 1px solid #2b3647;
+        }
+
+        .tabulator .tabulator-header .tabulator-col .tabulator-col-content
+        {
+            padding: 10px 12px;
+        }
+
+        .tabulator .tabulator-tableholder .tabulator-table
+        {
+            background: transparent;
+        }
+
+        .tabulator-row
+        {
+            background: transparent;
+            border-bottom: 1px solid rgba(55, 65, 81, 0.55);
+        }
+
+        .tabulator-row:hover
+        {
+            background: #243244;
+        }
+
+        .tabulator-cell
+        {
+            padding: 10px 12px;
+        }
+
+        .error-box
+        {
+            margin: 16px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            background: rgba(127, 29, 29, 0.2);
+            color: #fecaca;
+        }
+
+        .type-cell
+        {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .type-icon
+        {
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .type-text
+        {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: none;
+            line-height: 1;
+        }
+
+        .last-seen
+        {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 8px;
+            min-width: 64px;
+        }
+
+        .last-seen-text
+        {
+            display: inline-block;
+            min-width: 32px;
+            text-align: left;
+        }
+
+        .status-dot
+        {
+            display: inline-block;
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            flex: 0 0 11px;
+        }
+
+        .status-dot.green
+        {
+            background: #22c55e;
+        }
+
+        .status-dot.yellow
+        {
+            background: #facc15;
+        }
+
+        .status-dot.red
+        {
+            background: #ef4444;
+        }
+
+        .last-seen.unknown
+        {
+            min-width: 64px;
+            justify-content: center;
+            color: #9ca3af;
+        }
+
+        .type-cell
+        {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .type-icon
+        {
+            width: 16px;
+            height: 16px;
+        }
+
+        .type-text
+        {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1;
+        }
+        .node-link
+        {
+            color: var(--text);
+            cursor: pointer;
+            border-bottom: 1px dotted rgba(96,165,250,0.45);
+            transition: color 0.15s ease;
+        }
+
+        .node-link:hover
+        {
+            color: #93c5fd;
+        }
+
+        .map-frame
+        {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .chat-view
+        {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-view-header
+        {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .chat-view-body
+        {
+            flex: 1;
+            overflow-y: auto;
+            color: var(--text);
+            background: #0f172a;
+        }
+        .chat-messages
+        {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .chat-message
+{
+    max-width: 85%;
+}
+        .map-frame
+        {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .node-link
+        {
+            color: var(--text);
+            cursor: pointer;
+            border-bottom: 1px dotted rgba(96, 165, 250, 0.45);
+        }
+
+        .node-link:hover
+        {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        .checkbox-label
+        {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 14px;
+            user-select: none;
+            cursor: pointer;
+        }
+
+        .checkbox-label input
+        {
+            margin: 0;
+            width: 16px;
+            height: 16px;
+        }
+        .chat-view-body
+        {
+            flex: 1;
+            padding: 0;
+            overflow-y: auto;
+            color: var(--text);
+            background: #0f172a;
+        }
+
+        .chat-message
+        {
+            padding: 12px 14px;
+            border: 1px solid #334155;
+            border-radius: 10px;
+
+            background: #16233a;
+
+            box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+        }
+
+        .chat-message
+        {
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .chat-message-header
+        {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .chat-message-meta
+        {
+            display: inline-flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .chat-message-text
+        {
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.45;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .chat-empty
+        {
+            display: grid;
+            place-items: center;
+            height: 100%;
+            padding: 24px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .chat-error
+        {
+            margin: 16px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            background: rgba(127, 29, 29, 0.2);
+            color: #fecaca;
+        }
+        .tabulator-row.has-messages
+        {
+            background: rgba(96, 165, 250, 0.08);
+        }
+
+        .tabulator-row.has-messages:hover
+        {
+            background: rgba(96, 165, 250, 0.16);
+        }
+        .message-badge
+        {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 22px;
+            height: 18px;
+            margin-left: 8px;
+            padding: 0 6px;
+            border-radius: 999px;
+            background: rgba(96, 165, 250, 0.18);
+            border: 1px solid rgba(96, 165, 250, 0.35);
+            color: #bfdbfe;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1;
+            vertical-align: middle;
+            box-shadow: 0 0 4px rgba(96,165,250,0.35);
+        }
+
+        .node-name-wrap
+        {
+            display: inline-flex;
+            align-items: center;
+        }
+        .page-header
+        {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+
+            margin: 16px 16px 0 16px;
+            padding: 12px 18px;
+        }
+
+        .page-header-inner
+        {
+            display: flex;
+            align-items: center;
+            /*justify-content: center;
+            gap: 20px;*/
+        }
+
+        .header-logo
+        {
+            height: 60px;
+            width: auto;
+        }
+
+        .header-text
+        {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-title
+        {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.1;
+        }
+
+        .page-subtitle
+        {
+            font-size: 13px;
+            color: var(--muted);
+        }
+        .header-logo
+        {
+            height: 60px;
+            filter: drop-shadow(0 0 5px rgba(96,165,250,0.45));
+        }
+        ::-webkit-scrollbar
+        {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track
+        {
+            background: #0b1220;
+        }
+
+        ::-webkit-scrollbar-thumb
+        {
+            background: #334155;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover
+        {
+            background: #475569;
+        }
+        .toolbar-button
+        {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #0b1220;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .toolbar-button:hover
+        {
+            background: #162033;
+            border-color: #4b5563;
+        }
+        .map-frame
+        {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .leaflet-container
+        {
+            background: #0f172a;
+        }
+        .chat-input-bar
+        {
+            display: flex;
+            gap: 10px;
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .chat-input
+        {
+            flex: 1;
+            min-width: 0;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #0b1220;
+            color: var(--text);
+            outline: none;
+            font-size: 14px;
+        }
+
+        .chat-input:focus
+        {
+            border-color: var(--accent);
+        }
+
+        .chat-send-button
+        {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #0b1220;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .chat-send-button:hover
+        {
+            background: #162033;
+            border-color: #4b5563;
+        }
+
+        .chat-send-button:disabled,
+        .chat-input:disabled
+        {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .chat-message.outgoing
+        {
+            margin-left: auto;
+            background: rgba(96, 165, 250, 0.10);
+            border-color: rgba(96, 165, 250, 0.35);
+        }
+
+        .chat-message-status
+        {
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .chat-message-status.error
+        {
+            color: #fca5a5;
+        }
+
+        .chat-message-status.ok
+        {
+            color: #86efac;
+        }
+
+        .modal-overlay
+        {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(2, 6, 23, 0.75);
+            z-index: 1000;
+        }
+
+        .modal-overlay.visible
+        {
+            display: flex;
+        }
+
+        .modal-dialog
+        {
+            width: min(460px, 100%);
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+            overflow: hidden;
+        }
+
+        .modal-header
+        {
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--border);
+            background: var(--panel-2);
+        }
+
+        .modal-title
+        {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .modal-subtitle
+        {
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .modal-body
+        {
+            padding: 18px;
+        }
+
+        .modal-label
+        {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .modal-input
+        {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #0b1220;
+            color: var(--text);
+            outline: none;
+            font-size: 14px;
+        }
+
+        .modal-input:focus
+        {
+            border-color: var(--accent);
+        }
+
+        .modal-error
+        {
+            display: none;
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            background: rgba(127, 29, 29, 0.2);
+            color: #fecaca;
+            font-size: 13px;
+        }
+
+        .modal-actions
+        {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .sidebar-tabs
+        {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .sidebar-tab
+        {
+            border: 1px solid #666;
+            background: #222;
+            color: #eee;
+            padding: 0.5rem 0.8rem;
+            cursor: pointer;
+            border-radius: 0.35rem;
+        }
+
+        .sidebar-tab.active
+        {
+            background: #444;
+            font-weight: 600;
+        }
+
+        .sidebar-section
+        {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-panel
+        {
+            display: none;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .sidebar-panel.active
+        {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .channels-list
+        {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .channel-item
+        {
+            width: 100%;
+            text-align: left;
+            border: 1px solid #666;
+            background: #1f1f1f;
+            color: #eee;
+            padding: 0.65rem 0.8rem;
+            cursor: pointer;
+            border-radius: 0.35rem;
+        }
+
+        .channel-item:hover
+        {
+            background: #2a2a2a;
+        }
+
+        .channel-item.active
+        {
+            background: #3a3a3a;
+            font-weight: 600;
+        }
+
+        .channel-item-meta
+        {
+            display: block;
+            font-size: 0.85rem;
+            opacity: 0.75;
+            margin-top: 0.2rem;
+        }
+
+        .channels-empty
+        {
+            opacity: 0.7;
+            padding: 0.6rem 0.2rem;
+        }
+        .channels-toolbar
+        {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .channels-toolbar button
+        {
+            border: 1px solid #666;
+            background: #222;
+            color: #eee;
+            padding: 0.45rem 0.7rem;
+            cursor: pointer;
+            border-radius: 0.35rem;
+        }
+
+        .channels-toolbar button:hover
+        {
+            background: #2d2d2d;
+        }
+
+        .modal-overlay
+        {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 9999;
+        }
+
+        .modal-overlay.visible
+        {
+            display: flex;
+        }
+
+        .modal-dialog
+        {
+            width: min(92vw, 520px);
+            background: #1e1e1e;
+            color: #eee;
+            border: 1px solid #555;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-header h3
+        {
+            margin: 0 0 0.35rem 0;
+        }
+
+        .modal-subtitle
+        {
+            margin-bottom: 0.9rem;
+            opacity: 0.8;
+            font-size: 0.95rem;
+        }
+
+        .form-group
+        {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .form-group input,
+        .form-group textarea
+        {
+            border: 1px solid #666;
+            background: #111;
+            color: #eee;
+            border-radius: 0.35rem;
+            padding: 0.6rem 0.7rem;
+            font: inherit;
+        }
+
+        .modal-footer
+        {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+
+        .modal-footer button
+        {
+            border: 1px solid #666;
+            background: #222;
+            color: #eee;
+            padding: 0.5rem 0.8rem;
+            cursor: pointer;
+            border-radius: 0.35rem;
+        }
+
+        .modal-footer button:hover
+        {
+            background: #2d2d2d;
+        }
+
+        .modal-error
+        {
+            color: #ff8f8f;
+            margin-top: 0.3rem;
+        }
+        .channel-qr-code
+        {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem;
+            background: #fff;
+            border-radius: 0.35rem;
+            width: fit-content;
+            min-width: 220px;
+            min-height: 220px;
+        }
+
+        .channel-qr-code img,
+        .channel-qr-code canvas
+        {
+            display: block;
+        }
+        .header-left
+        {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        #discoverButton,
+        #settingsButton
+        {
+            width: 44px;
+            height: 44px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #0b1220;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #discoverButton:hover,
+        #settingsButton:hover
+        {
+            background: #162033;
+            border-color: #4b5563;
+        }
+
+        #discoverButton
+        {
+            margin-left: auto;
+        }
+
+        .discover-results-list
+        {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .discover-result-card
+        {
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .discover-result-title
+        {
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .discover-result-meta
+        {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .discover-empty
+        {
+            color: var(--muted);
+            padding: 12px 0;
+        }
+        .status-running
+        .status-running-icon
+        {
+            display: inline-block;
+            transform-origin: center center;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin
+        {
+            from
+            {
+                transform: rotate(0deg);
+            }
+
+            to
+            {
+                transform: rotate(360deg);
+            }
+        }
+        .status-spinner
+        {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #6b7280;
+            border-top-color: #e5e7eb;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+        }
+</style>
+</head>
+<body>
+    <header class="page-header">
+        <div class="page-header-inner">
+            <div class="header-left">
+                <img src="logo.png" class="header-logo" alt="MeshCore">
+                <div class="header-text">
+                    <div class="page-title">MeshCore Web-Dashboard</div>
+                    <div class="page-subtitle">by DJ0ABR</div>
+                </div>
+            </div>
+            <button id="discoverButton" type="button" title="Discover">🔎</button>
+            <button id="settingsButton" type="button" title="Setup">⚙</button>
+        </div>
+    </header>
+
+    <div class="app">
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h1 class="panel-title">Nodes</h1>
+                    <div class="panel-subtitle">sortierbar per Klick auf den Spaltenkopf</div>
+                </div>
+                <div id="nodeCount" class="status"></div>
+            </div>
+
+            <div class="toolbar">
+                <label for="typeFilter">Typ:</label>
+                <select id="typeFilter">
+                    <option value="all">Alle</option>
+                    <option value="chat">Chat</option>
+                    <option value="repeater">Repeater</option>
+                    <option value="room">Room</option>
+                    <option value="sensor">Sensor</option>
+                </select>
+
+                <label class="checkbox-label">
+                    <input type="checkbox" id="callsignFilter">
+                    Callsign
+                </label>
+
+                <button id="allMapButton" class="toolbar-button" type="button">AllMap</button>
+                <button id="advertButton" class="toolbar-button" type="button">Advert</button>
+            </div>
+
+            <div class="panel-content">
+                <div id="tableError"></div>
+                <div class="sidebar-section">
+                    <div class="sidebar-tabs">
+                        <button id="tabNodesBtn" class="sidebar-tab active" type="button">Contacts</button>
+                        <button id="tabChannelsBtn" class="sidebar-tab" type="button">Channels</button>
+                    </div>
+
+                    <div id="nodesPanel" class="sidebar-panel active">
+                        <div id="nodesTable"></div>
+                    </div>
+
+                    <div id="channelsPanel" class="sidebar-panel">
+                        <div class="channels-toolbar">
+                            <button id="createPrivateChannelBtn" type="button">Create Private</button>
+                            <button id="joinPrivateChannelBtn" type="button">Join Private</button>
+                            <button id="joinPublicChannelBtn" type="button">Join Public</button>
+                            <button id="joinHashtagChannelBtn" type="button">Join Hashtag</button>
+                            <button id="removeChannelBtn" type="button">Remove</button>
+                        </div>
+
+                        <div id="channelsList" class="channels-list"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2 class="panel-title">Messages</h2>
+                    <div class="panel-subtitle"></div>
+                </div>
+            </div>
+
+            <div class="panel-content">
+                <div id="mapView" class="map-frame" style="display:none;"></div>
+
+                <div id="chatView" class="chat-view" style="display:none;">
+                    <div class="chat-view-header">
+                        <strong id="chatTitle">Chat</strong>
+                    </div>
+
+                    <div id="chatBody" class="chat-view-body"></div>
+
+                    <div class="chat-input-bar">
+                        <input
+                            id="chatInput"
+                            class="chat-input"
+                            type="text"
+                            maxlength="400"
+                            placeholder="Nachricht eingeben und Enter drücken ..."
+                            autocomplete="off"
+                        >
+                        <button id="chatSendButton" class="chat-send-button" type="button">Senden</button>
+                    </div>
+                </div>
+
+                <div id="mapEmpty" class="empty-state">
+                    Linksklick auf Chat oder Room = Verlauf, Rechtsklick = Karte.
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+    <div id="roomPasswordModal" class="modal-overlay" aria-hidden="true">
+        <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="roomPasswordTitle">
+            <div class="modal-header">
+                <h3 id="roomPasswordTitle" class="modal-title">Passwort für Room</h3>
+                <div id="roomPasswordSubtitle" class="modal-subtitle"></div>
+            </div>
+            <div class="modal-body">
+                <label class="modal-label" for="roomPasswordInput">Room Passwort</label>
+                <input
+                    id="roomPasswordInput"
+                    class="modal-input"
+                    type="password"
+                    maxlength="64"
+                    autocomplete="off"
+                    placeholder="Passwort eingeben ..."
+                >
+                <div id="roomPasswordError" class="modal-error"></div>
+                <div class="modal-actions">
+                    <button id="roomPasswordCancelButton" class="toolbar-button" type="button">Abbrechen</button>
+                    <button id="roomPasswordSaveButton" class="chat-send-button" type="button">Speichern</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="channelModal" class="modal-overlay" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 id="channelModalTitle">Channel</h3>
+            </div>
+
+            <div class="modal-body">
+                <div id="channelModalSubtitle" class="modal-subtitle"></div>
+
+                <div id="channelNameGroup" class="form-group">
+                    <label for="channelNameInput">Channel name</label>
+                    <input id="channelNameInput" type="text" autocomplete="off">
+                </div>
+
+                <div id="channelSecretGroup" class="form-group">
+                    <label for="channelSecretInput">Secret key</label>
+                    <input id="channelSecretInput" type="text" autocomplete="off">
+                </div>
+
+                <div id="channelResultGroup" class="form-group" style="display:none;">
+                    <label for="channelResultSecret">Generated secret key</label>
+                    <textarea id="channelResultSecret" rows="3" readonly></textarea>
+                </div>
+
+                <div id="channelQrGroup" class="form-group" style="display:none;">
+                    <label>QR Code</label>
+                    <div id="channelQrCode" class="channel-qr-code"></div>
+                </div>
+
+                <div id="channelModalError" class="modal-error" style="display:none;"></div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="channelModalConfirmButton" type="button">OK</button>
+                <button id="channelModalCancelButton" type="button">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="discoverModal" class="modal-overlay" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3>Repeater Discovery</h3>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Status</label>
+                    <div id="discoverStatusText">Unbekannt</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Letzter Job</label>
+                    <div id="discoverJobInfo" class="modal-subtitle">Noch kein Discover gestartet.</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Gefundene Repeater</label>
+                    <div id="discoverResults" class="discover-results-list">
+                        <div class="discover-empty">Noch keine Ergebnisse.</div>
+                    </div>
+                </div>
+
+                <div id="discoverModalError" class="modal-error" style="display:none;"></div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="discoverRepeatButton" type="button">START</button>
+                <button id="discoverCloseButton" type="button">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="setupModal" class="modal-overlay" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3>Companion Setup</h3>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="setupNameInput">Name</label>
+                    <input id="setupNameInput" type="text" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label for="setupLatInput">Latitude</label>
+                    <input id="setupLatInput" type="text" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label for="setupLonInput">Longitude</label>
+                    <input id="setupLonInput" type="text" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label>Feste Funkparameter</label>
+                    <div>Frequenz: 869.618 MHz</div>
+                    <div>Bandwidth: 62.5 kHz</div>
+                    <div>SF: 8</div>
+                    <div>CR: 8</div>
+                    <div>TX Power: 22 dBm</div>
+                </div>
+
+                <div id="setupModalError" class="modal-error" style="display:none;"></div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="setupApplyButton" type="button">Apply</button>
+                <button id="setupCancelButton" type="button">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/tabulator-tables@6.3.0/dist/js/tabulator.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
