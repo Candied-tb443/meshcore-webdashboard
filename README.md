@@ -177,3 +177,11 @@ Um MeshCore-Repeater zu suchen:
 
 Es werden erreichbare Repeater gesucht.\
 Der Vorgang kann **mehrfach ausgeführt** werden.
+
+------------------------------------------------------------------------
+
+## License
+
+This project is licensed under the MIT License.
+
+This project is not affiliated with the MeshCore project.
