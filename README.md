@@ -1,5 +1,7 @@
 # MeshCore Web Dashboard
 
+<sub>by DJ0ABR (c) 2026</sub>
+
 Web-Dashboard für **MeshCore Nodes** mit Fokus auf Desktop-Systeme.
 
 -   läuft unter **Linux** (Raspberry Pi, PC usw.)
