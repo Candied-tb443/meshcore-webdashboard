@@ -154,8 +154,16 @@ Das Dashboard ist jetzt einsatzbereit.
 Wenn Stationen empfangen werden, erscheinen diese in der **Node-Liste
 auf der linken Seite**.
 
-⚠️ Hinweis:\
+⚠️ Hinweis:  
 Bis erste Nodes erscheinen, kann **eine Stunde oder länger** vergehen.
+
+## Bedienung
+
+- **Rechtsklick auf einen Node:**  
+  Es öffnet sich eine **Karte mit der Position** des Nodes.
+
+- **Linksklick auf einen Chat oder Room:**  
+  Das **Chatfenster wird geöffnet**.
 
 ------------------------------------------------------------------------
 
