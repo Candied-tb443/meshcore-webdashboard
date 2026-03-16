@@ -67,6 +67,7 @@ const state =
 {
     leafletMap: null,
     leafletMarkers: null,
+    autoZoom: true,
     rightView: "empty",
     chatRow: null,
     chatRefreshTimer: null,
@@ -1148,7 +1149,10 @@ function showMapForRow(row)
 
     const marker = L.marker([pos.lat, pos.lon], { icon: getMarkerIcon(row) }).addTo(state.leafletMarkers);
     marker.bindPopup(escapeHtml(row.name || "-"));
-    map.setView([pos.lat, pos.lon], 13);
+    if (state.autoZoom)
+    {
+        map.setView([pos.lat, pos.lon], 13);
+    }
 
     setTimeout(function()
     {
@@ -1218,13 +1222,17 @@ function showAllNodesMap()
     {
         map.invalidateSize();
 
-        if (bounds.length === 1)
+        if (state.autoZoom)
         {
-            map.setView(bounds[0], 13);
-        }
-        else
-        {
-            map.fitBounds(bounds, { padding: [30, 30] });
+            if (bounds.length === 1)
+            {
+                map.setView(bounds[0], 13);
+            }
+            else
+            {
+                map.fitBounds(bounds, { padding: [30, 30] });
+            }
+            state.autoZoom = false;
         }
     }, 0);
 }
@@ -2261,6 +2269,7 @@ table = new Tabulator("#nodesTable",
 
                 if (hasLocation(row))
                 {
+                    state.autoZoom = true;
                     showMapForRow(row);
                 }
                 else if (isChatLikeNode(row))
@@ -2872,6 +2881,7 @@ if (el.allMapButton)
 {
     el.allMapButton.addEventListener("click", function()
     {
+        state.autoZoom = true;
         showAllNodesMap();
     });
 }
