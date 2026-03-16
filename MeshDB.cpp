@@ -202,11 +202,13 @@ bool MeshDB::Init(const Config& config)
 
     Dann in MariaDB:
 
+    DROP USER IF EXISTS 'meshcore'@'localhost';
+
     CREATE DATABASE IF NOT EXISTS meshcore
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_general_ci;
 
-    CREATE USER IF NOT EXISTS 'meshcore'@'localhost' IDENTIFIED BY '';
+    CREATE USER 'meshcore'@'localhost';
     GRANT ALL PRIVILEGES ON meshcore.* TO 'meshcore'@'localhost';
     FLUSH PRIVILEGES;
 
@@ -752,6 +754,7 @@ bool MeshDB::UpsertNodeFromAdvert(const DataConnector::AdvertInfo& info)
         DataConnector::hexBytes(info.publicKey.data(), info.publicKey.size());
 
     const bool hasLocation = (info.advLatE6 != 0) || (info.advLonE6 != 0);
+    const std::time_t lastAdvert = info.lastAdvert;
 
     std::ostringstream oss;
 
@@ -764,7 +767,7 @@ bool MeshDB::UpsertNodeFromAdvert(const DataConnector::AdvertInfo& info)
         << unsigned(info.flags) << ", "
         << ToSqlString(info.name) << ", "
         << ToSqlString(publicKeyHex) << ", "
-        << ToSqlDateTime(info.lastAdvert) << ", ";
+        << ToSqlDateTime(lastAdvert) << ", ";
 
     if (hasLocation)
     {
@@ -825,6 +828,7 @@ bool MeshDB::UpsertNodeFromPushNewAdvert(const DataConnector::PushNewAdvertInfo&
 
     const std::string prefix6Hex =
         DataConnector::hexBytes(info.prefix6.data(), info.prefix6.size());
+    const uint32_t lastAdvert = info.lastAdvert;
 
     std::ostringstream oss;
 
@@ -832,7 +836,7 @@ bool MeshDB::UpsertNodeFromPushNewAdvert(const DataConnector::PushNewAdvertInfo&
         << "INSERT INTO nodes (prefix6_hex, name, last_advert_at, last_mod_at) VALUES ("
         << ToSqlString(prefix6Hex) << ", "
         << ToSqlString(info.name) << ", "
-        << ToSqlDateTimeFromU32(info.lastAdvert) << ", "
+        << ToSqlDateTimeFromU32(lastAdvert) << ", "
         << ToSqlDateTimeFromU32(info.lastMod)
         << ") ON DUPLICATE KEY UPDATE "
         << "name=VALUES(name), "

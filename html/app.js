@@ -60,6 +60,7 @@ const el =
     setupApplyButton: document.getElementById("setupApplyButton"),
     setupCancelButton: document.getElementById("setupCancelButton"),
     setupModalError: document.getElementById("setupModalError"),
+    pageTitle: document.getElementById("pageTitle"),
 };
 
 const state =
@@ -1264,7 +1265,12 @@ function relativeTime(cell)
     }
     else if (diff < 86400)
     {
-        text = Math.floor(diff / 3600) + "h";
+        const hours = Math.floor(diff / 3600);
+        const minutes = Math.floor((diff % 3600) / 60);
+
+        const minStr = String(minutes).padStart(2, "0");
+
+        text = hours + ":" + minStr + "h";
     }
     else
     {
@@ -2593,6 +2599,22 @@ function updateLeftCounter()
     el.nodeCount.textContent = `${count} Nodes`;
 }
 
+function updatePageTitle(nodeName)
+{
+    const baseTitle = "MeshCore Web-Dashboard";
+
+    if (el.pageTitle)
+    {
+        el.pageTitle.textContent = nodeName
+            ? baseTitle + " – " + nodeName
+            : baseTitle;
+    }
+
+    document.title = nodeName
+        ? "MeshCore – " + nodeName
+        : "MeshCore Dashboard";
+}
+
 function initLeftTabs()
 {
     const tabNodesBtn = document.getElementById("tabNodesBtn");
@@ -2803,6 +2825,7 @@ if (el.setupApplyButton)
         try
         {
             await applyCompanionSetup();
+            updatePageTitle(el.setupNameInput ? el.setupNameInput.value.trim() : "");
             closeSetupDialog();
         }
         catch (error)
@@ -3060,14 +3083,23 @@ showEmptyRightPanel();
     }
 })();
 
-setInterval(function()
+(async function()
 {
-    table.replaceData(); 
-}, 10000);
+    try
+    {
+        const data = await loadCompanionSetup();
+        const cfg = data && data.config ? data.config : null;
+        updatePageTitle(cfg && cfg.name ? cfg.name : "");
+    }
+    catch (err)
+    {
+        console.error("Initial setup load failed:", err);
+        updatePageTitle("");
+    }
+})();
 
 setInterval(function()
 {
-    //table.redraw(true);
     refreshNodesTableKeepScroll();
 }, 5000);
 
@@ -3083,4 +3115,5 @@ setInterval(async function()
         console.error("Channels refresh failed:", err);
     }
 }, 10000);
+
 

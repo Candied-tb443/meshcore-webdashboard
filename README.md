@@ -73,14 +73,12 @@ sudo mariadb
 Folgenden SQL-Block einfügen:
 
 ``` sql
+DROP USER IF EXISTS 'meshcore'@'localhost';
 CREATE DATABASE IF NOT EXISTS meshcore
 CHARACTER SET utf8mb4
 COLLATE utf8mb4_general_ci;
-
-CREATE USER IF NOT EXISTS 'meshcore'@'localhost' IDENTIFIED BY '';
-
+CREATE USER 'meshcore'@'localhost';
 GRANT ALL PRIVILEGES ON meshcore.* TO 'meshcore'@'localhost';
-
 FLUSH PRIVILEGES;
 ```
 
