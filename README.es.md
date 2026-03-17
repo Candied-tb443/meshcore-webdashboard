@@ -10,28 +10,28 @@
 
 <sub>by DJ0ABR (c) 2026</sub>
 
-Web dashboard for **MeshCore nodes** with a focus on desktop systems.
+Panel web para **nodos MeshCore** con enfoque en sistemas de escritorio.
 
--   runs on **Linux** (Raspberry Pi, PC, etc.)
--   **no smartphone required**
--   optimized for **desktop monitors**
--   accessible with **any modern browser** on the local network
-
-------------------------------------------------------------------------
-
-# Features
-
-Among other things, the dashboard offers:
-
--   display of **nodes and rooms**
--   **chat messages**
--   **channel management**
--   **repeater discovery**
--   **map view** of nodes
+-   funciona en **Linux** (Raspberry Pi, PC, etc.)
+-   **no se necesita smartphone**
+-   optimizado para **monitores de escritorio**
+-   acceso con **cualquier navegador moderno** dentro de la red local
 
 ------------------------------------------------------------------------
 
-## Screenshots
+# Funciones
+
+Entre otras cosas, el panel ofrece:
+
+-   visualización de **nodos y salas**
+-   **mensajes de chat**
+-   **gestión de canales**
+-   **descubrimiento de repetidores**
+-   **vista de mapa** de los nodos
+
+------------------------------------------------------------------------
+
+## Capturas de pantalla
 
 <p align="center">
 <img src="doku/pic1.png" width="250">
@@ -46,23 +46,23 @@ Among other things, the dashboard offers:
 
 ------------------------------------------------------------------------
 
-# Prepare the hardware
+# Preparar el hardware
 
-1. Open the **WebFlasher** on the MeshCore website.
-2. Flash the `Companion-USB` package.
+1. Abre el **WebFlasher** en el sitio web de MeshCore.
+2. Flashea el paquete `Companion-USB`.
 
 ------------------------------------------------------------------------
 
-# Installation
+# Instalación
 
-Clone the repository:
+Clonar el repositorio:
 
 ``` bash
 git clone https://github.com/USER/meshcore-webdashboard.git
 cd meshcore-webdashboard
 ```
 
-Install the packages:
+Instalar los paquetes:
 
 ``` bash
 sudo ./install.sh
@@ -70,15 +70,15 @@ sudo ./install.sh
 
 ------------------------------------------------------------------------
 
-# Prepare the database
+# Preparar la base de datos
 
-Start MariaDB:
+Iniciar MariaDB:
 
 ``` bash
 sudo mariadb
 ```
 
-Insert the following SQL block:
+Insertar el siguiente bloque SQL:
 
 ``` sql
 DROP USER IF EXISTS 'meshcore'@'localhost';
@@ -92,15 +92,15 @@ FLUSH PRIVILEGES;
 
 ------------------------------------------------------------------------
 
-# Build the software
+# Compilar el software
 
-Compile everything:
+Compilar todo:
 
 ``` bash
 make
 ```
 
-Install the HTML files:
+Instalar los archivos HTML:
 
 ``` bash
 sudo cp -R html/* /var/www/html
@@ -108,25 +108,25 @@ sudo cp -R html/* /var/www/html
 
 ------------------------------------------------------------------------
 
-# Start the program
+# Iniciar el programa
 
-Connect the hardware via USB.
+Conecta el hardware por USB.
 
-Determine the serial port:
+Determinar el puerto serie:
 
 ``` bash
 ls /dev/tty*
 ```
 
-Examples:
+Ejemplos:
 
-If the port is **ttyUSB0**:
+Si el puerto es **ttyUSB0**:
 
 ``` bash
 ./meshcore_api
 ```
 
-If the port is **ttyACM0**:
+Si el puerto es **ttyACM0**:
 
 ``` bash
 ./meshcore_api /dev/ttyACM0
@@ -134,57 +134,57 @@ If the port is **ttyACM0**:
 
 ------------------------------------------------------------------------
 
-# Open the dashboard
+# Abrir el panel
 
-In a browser within the home network:
+En el navegador dentro de la red doméstica:
 
-    http://IP_of_the_Raspberry_Pi
-
-------------------------------------------------------------------------
-
-# Initial setup
-
-1.  Click the **gear icon** in the upper right corner.
-2.  In the setup window, enter the following data:
-
--   **Name** (spaces and special characters are allowed)
--   **Longitude**
--   **Latitude**
-
-3.  Click **Apply**.
+    http://IP_de_la_Raspberry_Pi
 
 ------------------------------------------------------------------------
 
-# Operation
+# Configuración inicial
 
-The dashboard is now ready to use.
+1.  Haz clic en el **icono de engranaje** arriba a la derecha.
+2.  En la ventana de configuración, introduce los siguientes datos:
 
-When stations are received, they appear in the **node list on the left
-side**.
+-   **Nombre** (se permiten espacios y caracteres especiales)
+-   **Longitud**
+-   **Latitud**
 
-⚠️ Note:  
-It may take **an hour or longer** before the first nodes appear.
+3.  Haz clic en **Apply**.
 
-## Usage
+------------------------------------------------------------------------
 
-- **Right-click on a node:**  
-  A **map with the node's position** opens.
+# Funcionamiento
 
-- **Left-click on a chat or room:**  
-  The **chat window opens**.
+El panel ya está listo para usarse.
+
+Cuando se reciben estaciones, aparecen en la **lista de nodos de la
+parte izquierda**.
+
+⚠️ Nota:  
+Puede pasar **una hora o más** hasta que aparezcan los primeros nodos.
+
+## Uso
+
+- **Clic derecho sobre un nodo:**  
+  Se abre un **mapa con la posición** del nodo.
+
+- **Clic izquierdo sobre un chat o sala:**  
+  Se abre la **ventana de chat**.
 
 ------------------------------------------------------------------------
 
 # Repeater Discovery
 
-To search for MeshCore repeaters:
+Para buscar repetidores MeshCore:
 
-1.  Click the **magnifying glass icon** in the upper right corner.
-2.  The **Repeater Discovery** window opens.
-3.  Click **START**.
+1.  Haz clic en el **icono de lupa** arriba a la derecha.
+2.  Se abre la ventana **Repeater Discovery**.
+3.  Haz clic en **START**.
 
-Reachable repeaters will be searched for.\
-The process can be **run multiple times**.
+Se buscarán repetidores accesibles.\
+El proceso puede **ejecutarse varias veces**.
 
 ------------------------------------------------------------------------
 
