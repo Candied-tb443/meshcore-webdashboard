@@ -119,7 +119,23 @@ const icons =
 
 function getLocale()
 {
-    return getLanguage() === "en" ? "en-GB" : "de-DE";
+    const lang = getLanguage();
+
+    switch (lang)
+    {
+        case "de":
+            return "de-DE";
+        case "en":
+            return "en-GB";
+        case "es":
+            return "es-ES";
+        case "fr":
+            return "fr-FR";
+        case "it":
+            return "it-IT";
+        default:
+            return "de-DE";
+    }
 }
 
 function tr(key, fallback, vars = {})
