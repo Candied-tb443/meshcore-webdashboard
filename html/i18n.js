@@ -79,7 +79,7 @@ const I18N =
         "channel.action.join_public.confirm": "Beitreten",
 
         "channel.action.join_hashtag.title": "Hashtag-Kanal beitreten",
-        "channel.action.join_hashtag.subtitle": "Hashtag-Kanal eingeben, z. B. #drones.",
+        "channel.action.join_hashtag.subtitle": "Gib den gewünschten Hashtag-Channel ein, z. B. #db0sl. Der Schlüssel wird automatisch aus dem Hashtag erzeugt – es ist keine zusätzliche Eingabe erforderlich.",
         "channel.action.join_hashtag.confirm": "Beitreten",
 
         "channel.action.remove.title": "Kanal entfernen",
@@ -248,7 +248,7 @@ const I18N =
         "channel.action.join_public.confirm": "Join",
 
         "channel.action.join_hashtag.title": "Join hashtag channel",
-        "channel.action.join_hashtag.subtitle": "Enter a hashtag channel, e.g. #drones.",
+        "channel.action.join_hashtag.subtitle": "Enter the desired hashtag channel, e.g. #db0sl. The key is automatically derived from the hashtag – no additional input is required.",
         "channel.action.join_hashtag.confirm": "Join",
 
         "channel.action.remove.title": "Remove channel",
@@ -417,7 +417,7 @@ const I18N =
         "channel.action.join_public.confirm": "Unirse",
 
         "channel.action.join_hashtag.title": "Unirse a un canal hashtag",
-        "channel.action.join_hashtag.subtitle": "Introduce un canal hashtag, por ejemplo #drones.",
+        "channel.action.join_hashtag.subtitle": "Introduce el canal hashtag deseado, p. ej. #db0sl. La clave se genera automáticamente a partir del hashtag – no se requiere ninguna entrada adicional.",
         "channel.action.join_hashtag.confirm": "Unirse",
 
         "channel.action.remove.title": "Eliminar canal",
@@ -586,7 +586,7 @@ const I18N =
         "channel.action.join_public.confirm": "Rejoindre",
 
         "channel.action.join_hashtag.title": "Rejoindre un canal hashtag",
-        "channel.action.join_hashtag.subtitle": "Saisissez un canal hashtag, par ex. #drones.",
+        "channel.action.join_hashtag.subtitle": "Saisissez le canal hashtag souhaité, par ex. #db0sl. La clé est automatiquement dérivée du hashtag – aucune saisie supplémentaire n'est nécessaire.",
         "channel.action.join_hashtag.confirm": "Rejoindre",
 
         "channel.action.remove.title": "Supprimer le canal",
@@ -755,7 +755,7 @@ const I18N =
         "channel.action.join_public.confirm": "Unisciti",
 
         "channel.action.join_hashtag.title": "Unisciti a un canale hashtag",
-        "channel.action.join_hashtag.subtitle": "Inserisci un canale hashtag, ad esempio #drones.",
+        "channel.action.join_hashtag.subtitle": "Inserisci il canale hashtag desiderato, ad es. #db0sl. La chiave viene generata automaticamente dall'hashtag – non è necessario alcun inserimento aggiuntivo.",
         "channel.action.join_hashtag.confirm": "Unisciti",
 
         "channel.action.remove.title": "Rimuovi canale",
